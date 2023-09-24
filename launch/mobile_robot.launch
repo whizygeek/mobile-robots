@@ -1,0 +1,24 @@
+<launch>
+
+    <include file="$(find jackal_gazebo)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find mobile_robots)/amr_worlds/worlds/maze.world"/>
+    </include>
+
+    <param name="robot_description" command="$(find xacro)/xacro $(find mobile_robots)/urdf/jackal_lidar.urdf.xacro" />
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="mr_robot_state_publisher"/>
+    <node pkg="joint_state_publisher" type="joint_state_publisher" name="mr_joint_state_publisher"/>
+
+    <arg name="rviz_config_file" default="$(find mobile_robots)/config/robot.rviz" />
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_config_file)" />
+
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find mobile_robots)/maps/maze.yaml" />
+
+    <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen"/>
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+        <rosparam file="$(find mobile_robots)/config/move_base_params.yaml" command="load"/>
+    </node>
+    
+
+</launch>
